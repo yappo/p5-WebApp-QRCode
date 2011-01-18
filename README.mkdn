@@ -4,17 +4,38 @@ WebApp::QRCode -
 
 # SYNOPSIS
 
+app.psgi
+
   use WebApp::QRCode;
+  use Plack::Builder;
+
+  builder {
+      mount '/qrcode' => WebApp::QRCode->new;
+      mount '/'       => $app;
+  };
+
+in shell
+
+  $ plackup -p 5000 app.psgi
+  $ wget "http://localhost:5000/qrcode?body=foobar
 
 # DESCRIPTION
 
 WebApp::QRCode is
+
+## new( filetype => 'png', queryname => 'body', %ImagerQRcodeOptions )
+
+## to_app
+
+## call
 
 # AUTHOR
 
 Kazuhiro Osawa <yappo {at} shibuya {dot} pl>
 
 # SEE ALSO
+
+[Imager::QRCode](http://search.cpan.org/perldoc?Imager::QRCode)
 
 # LICENSE
 

@@ -2,16 +2,41 @@ NAME
     WebApp::QRCode -
 
 SYNOPSIS
+    app.psgi
+
       use WebApp::QRCode;
+      use Plack::Builder;
+
+      builder {
+          mount '/qrcode' => WebApp::QRCode->new;
+          mount '/'       => $app;
+      };
+
+    in shell
+
+      $ plackup -p 5000 app.psgi
+      $ wget "http://localhost:5000/qrcode?body=foobar
 
 DESCRIPTION
     WebApp::QRCode is
 
+  new( filetype => 'png', queryname => 'body', %ImagerQRcodeOptions )
+  to_app
+  call
 AUTHOR
     Kazuhiro Osawa <yappo {at} shibuya {dot} pl>
 
 SEE ALSO
+    Imager::QRCode
+
 LICENSE
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 91:
+        Unknown directive: =METHODS
 

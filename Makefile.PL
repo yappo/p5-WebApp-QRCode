@@ -5,7 +5,8 @@ readme_from 'lib/WebApp/QRCode.pm';
 readme_markdown_from 'lib/WebApp/QRCode.pm';
 githubmeta;
 
-# requires '';
+requires 'Plack::Request';
+requires 'Imager::QRCode';
 
 tests 't/*.t';
 author_tests 'xt';
