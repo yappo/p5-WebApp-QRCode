@@ -22,7 +22,7 @@ sub new {
     my $queryname = delete $args{queryname} || 'body';
 
     bless {
-        qr        => Imager::QRCode->new(%args),
+        qrcode    => Imager::QRCode->new(%args),
         queryname => $queryname,
         filetype  => $filetype,
     }, $class;
@@ -32,7 +32,7 @@ sub call {
     my($self, $env) = @_;
 
     my $req = Plack::Request->new($env);
-    my $img = $self->{qr}->plot($req->parameters->get($self->{queryname}));
+    my $img = $self->{qrcode}->plot($req->parameters->get($self->{queryname}));
     $img->write( data => \my $data, type => $self->{filetype} ) or do {
         my $msg = $img->errstr;
         return [
