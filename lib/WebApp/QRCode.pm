@@ -15,16 +15,9 @@ our %MIME_TYPES = (
 
 sub new {
     my($class, %args) = @_;
-
-    my $filetype = delete $args{filetype} || '';
-    $filetype = 'png' unless $MIME_TYPES{$filetype};
-
-    my $queryname = delete $args{queryname} || 'body';
-
     bless {
-        qrcode    => Imager::QRCode->new(%args),
-        queryname => $queryname,
-        filetype  => $filetype,
+        filetype  => delete $args{filetype} || '',
+        qr_params => \%args,
     }, $class;
 }
 
@@ -32,8 +25,19 @@ sub call {
     my($self, $env) = @_;
 
     my $req = Plack::Request->new($env);
-    my $img = $self->{qrcode}->plot($req->parameters->get($self->{queryname}));
-    $img->write( data => \my $data, type => $self->{filetype} ) or do {
+
+    my %qr_params = %{ $self->{qr_params} };
+    for my $name (qw/ size margin version level mode casesensitive /) {
+        $qr_params{$name} = $req->parameters->get($name)
+            if $req->parameters->get($name);
+    }
+
+    my $filetype = $req->parameters->get('filetype') || $self->{filetype};
+    $filetype = 'png' unless $MIME_TYPES{$filetype};
+
+    my $qrcode = Imager::QRCode->new(%qr_params);
+    my $img = $qrcode->plot($req->parameters->get('body'));
+    $img->write( data => \my $data, type => $filetype ) or do {
         my $msg = $img->errstr;
         return [
             500,
@@ -48,7 +52,7 @@ sub call {
     return [
         200,
         [
-            'Content-Type'   => $MIME_TYPES{$self->{filetype}},
+            'Content-Type'   => $MIME_TYPES{$filetype},
             'Content-Length' => length($data),
         ],
         [ $data ],
@@ -88,13 +92,29 @@ in shell
 
 WebApp::QRCode is
 
-=METHODS
+=head1 METHODS
 
-=head2 new( filetype => 'png', queryname => 'body', %ImagerQRcodeOptions )
+=head2 new( filetype => 'png', %ImagerQRcodeOptions )
 
 =head2 to_app
 
 =head2 call
+
+=head1 ACCEPT QUERY PARAMETERS
+
+=head2 filetype
+
+=head2 size
+
+=head2 margin
+
+=head2 version
+
+=head2 level
+
+=head2 mode
+
+=head2 casesensitive
 
 =head1 AUTHOR
 
