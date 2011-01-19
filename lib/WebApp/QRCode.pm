@@ -4,6 +4,7 @@ use warnings;
 our $VERSION = '0.01';
 use overload '&{}' => sub { shift->to_app(@_) }, fallback => 1;
 
+use Encode;
 use Plack::Request;
 use Imager::QRCode;
 
@@ -36,7 +37,11 @@ sub call {
     $filetype = 'png' unless $MIME_TYPES{$filetype};
 
     my $qrcode = Imager::QRCode->new(%qr_params);
-    my $img = $qrcode->plot($req->parameters->get('body'));
+
+    my $body = $req->parameters->get('body');
+    $body = encode('shiftjis', decode_utf8($body)) if ($qr_params{mode} || '') eq 'kanji';
+
+    my $img = $qrcode->plot($body);
     $img->write( data => \my $data, type => $filetype ) or do {
         my $msg = $img->errstr;
         return [

@@ -5,6 +5,7 @@ readme_from 'lib/WebApp/QRCode.pm';
 readme_markdown_from 'lib/WebApp/QRCode.pm';
 githubmeta;
 
+requires 'Encode';
 requires 'Plack::Request';
 requires 'Imager::QRCode';
 
